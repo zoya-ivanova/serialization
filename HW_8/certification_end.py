@@ -1,0 +1,57 @@
+# Напишите функцию, которая получает на вход директорию и рекурсивно обходит её и все вложенные директории. 
+# Результаты обхода сохраните в файлы json, csv и pickle.
+#   ○ Для дочерних объектов указывайте родительскую директорию.
+#   ○ Для каждого объекта укажите файл это или директория.
+#   ○ Для файлов сохраните его размер в байтах, а для директорий размер файлов в ней с учётом всех вложенных файлов и директорий.
+
+# Соберите из созданных на уроке и в рамках домашнего задания функций пакет для работы с файлами разных форматов.
+
+code_to_write = '''
+import os
+import json
+import csv
+import pickle
+
+def get_dir_size(directory):
+    total_size = 0
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            path = os.path.join(root, name)
+            total_size += os.path.getsize(path)
+        for name in dirs:
+            path = os.path.join(root, name)
+            total_size += get_dir_size(path)
+    return total_size
+
+
+def traverse_directory(directory):
+    results = []
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            path = os.path.join(root, name)
+            size = os.path.getsize(path)
+            results.append({'Path': path, 'Type': 'File', 'Size': size})
+        for name in dirs:
+            path = os.path.join(root, name)
+            size = get_dir_size(path)
+            results.append({'Path': path, 'Type': 'Directory', 'Size': size})
+    return results
+
+def save_results_to_json(results, filename):
+    with open(filename, 'w') as f:
+        json.dump(results, f, indent=4)
+
+def save_results_to_csv(results, filename):
+    with open(filename, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=['Path', 'Type', 'Size'])
+        writer.writeheader()
+        for result in results:
+            writer.writerow(result)
+
+def save_results_to_pickle(results, filename):
+    with open(filename, 'wb') as f:
+        pickle.dump(results, f)
+'''
+
+with open("__init__.py", "w") as init_file:
+    init_file.write(code_to_write)
